@@ -10,7 +10,7 @@ void pendulumWaves::setup(){
   height = ofGetHeight();
   //configure all of our pendula
   for(int i = 0; i < numPendulums; i++) {
-    float freq = (20.0 + i) / 60.0;
+    float freq = (20.0 + i) / 240.0;
     pendulums[i].index = i;
     pendulums[i].freq = freq;
     pendulums[i].pos = 1;
@@ -36,7 +36,7 @@ void pendulumWaves::update(){
       pendulums[i].hit = 1;
     }
     else {
-      pendulums[i].hit *= 0.85;
+      pendulums[i].hit *= 0.95;
     }
   }
 }
@@ -47,9 +47,9 @@ void pendulumWaves::draw(){
   ofTranslate(width/2, height/2);
   for(int i = 0; i < numPendulums; i++) {
     ofSetColor(255*pendulums[i].hit);
-    float rad = ofMap(pendulums[i].pos, -1, 1, 0, width/2);
+    float rad = ofMap(pendulums[i].pos, -1, 1, 0, height/2);
     float theta = TWO_PI / numPendulums * i;
-    ofCircle(rad*cos(theta), rad*sin(theta), 20);
+    ofCircle(rad*cos(theta), rad*sin(theta), 10);
   }
   ofPopMatrix();
 }
