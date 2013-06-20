@@ -17,6 +17,7 @@ class pendulumWaves : public ofBaseApp{
   void windowResized(int w, int h);
   void dragEvent(ofDragInfo dragInfo);
   void gotMessage(ofMessage msg);
+  void audioOut(float* output, int bufferSize, int nChannels);
 
   struct Pendulum {
     int index;
@@ -33,4 +34,15 @@ class pendulumWaves : public ofBaseApp{
   float startTime;
   ofImage img;
   int counter;
+  
+  //audio
+  ofSoundStream soundStream;
+  int sampleRate;
+  float volume;
+  vector<float> lAudio;
+  vector<float> rAudio;
+  float targetFrequency;
+  float phase;
+  float phaseAdder;
+  float phaseAdderTarget;
 };

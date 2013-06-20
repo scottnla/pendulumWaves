@@ -19,6 +19,19 @@ void pendulumWaves::setup(){
   }
   startTime = ofGetElapsedTimeMillis();
   startTime *= 0.001;
+
+  //setup audio
+  int bufferSize = 512;
+  sampleRate = 44100;
+  phase = 0;
+  phaseAdder = 0.0;
+  targetFrequency = 2000;
+  phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+  volume = 1.0;
+
+  lAudio.assign(bufferSize, 0.0);
+  rAudio.assign(bufferSize, 0.0);
+  soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
 }
 
 //--------------------------------------------------------------
@@ -39,6 +52,7 @@ void pendulumWaves::update(){
       pendulums[i].hit *= 0.95;
     }
   }
+  
 }
 
 //--------------------------------------------------------------
@@ -97,4 +111,24 @@ void pendulumWaves::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void pendulumWaves::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+//--------------------------------------------------------------
+void pendulumWaves::audioOut(float* output, int bufferSize, int nChannels){
+  float leftScale = 0.5;
+  float rightScale = 0.5;
+
+  // sin (n) seems to have trouble when n is very large, so we                                                                         
+  // keep phase in the range of 0-TWO_PI like this:                                                                                    
+  while (phase > TWO_PI){
+    phase -= TWO_PI;
+  }
+
+  phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
+  for (int i = 0; i < bufferSize; i++){
+    phase += phaseAdder;
+    float sample = sin(phase);
+    lAudio[i] = output[i*nChannels    ] = sample * volume * leftScale;
+    rAudio[i] = output[i*nChannels + 1] = sample * volume * rightScale;
+  }
 }
