@@ -31,7 +31,7 @@ void pendulumWaves::setup(){
 
   lAudio.assign(bufferSize, 0.0);
   rAudio.assign(bufferSize, 0.0);
-  soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
+  //  soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
 }
 
 //--------------------------------------------------------------
@@ -58,12 +58,14 @@ void pendulumWaves::update(){
 //--------------------------------------------------------------
 void pendulumWaves::draw(){
   ofPushMatrix();
-  ofTranslate(width/2, height/2);
   for(int i = 0; i < numPendulums; i++) {
-    ofSetColor(255*pendulums[i].hit);
-    float rad = ofMap(pendulums[i].pos, -1, 1, 0, height/2);
     float theta = TWO_PI / numPendulums * i;
-    ofCircle(rad*cos(theta), rad*sin(theta), 10);
+    float delta = TWO_PI / numPendulums;
+    ofPath path;
+    path.moveTo(width/2, height/2);
+    path.arc(width/2, height/2, height/2, height/2, ofRadToDeg(theta - delta/2), ofRadToDeg(theta + delta/2));
+    path.setFillColor(255*pendulums[i].hit);
+    path.draw();
   }
   ofPopMatrix();
 }
