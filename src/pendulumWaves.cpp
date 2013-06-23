@@ -58,14 +58,11 @@ void pendulumWaves::update(){
 //--------------------------------------------------------------
 void pendulumWaves::draw(){
   ofPushMatrix();
+  ofTranslate(width/2, height/2);
   for(int i = 0; i < numPendulums; i++) {
-    float theta = TWO_PI / numPendulums * i;
-    float delta = TWO_PI / numPendulums;
-    ofPath path;
-    path.moveTo(width/2, height/2);
-    path.arc(width/2, height/2, height/2, height/2, ofRadToDeg(theta - delta/2), ofRadToDeg(theta + delta/2));
-    path.setFillColor(255*pendulums[i].hit);
-    path.draw();
+    float radius = width / (2 * numPendulums) * i;
+    float theta = ofMap(pendulums[i].pos, -1, 1, 0, TWO_PI);
+    ofCircle(radius*cos(theta), radius*sin(theta), 10);
   }
   ofPopMatrix();
 }
