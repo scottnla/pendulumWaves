@@ -29,7 +29,7 @@ class pendulumWaves : public ofBaseApp{
   
   //visuals
   float width, height;
-  static const int numPendulums = 20;
+  static const int numPendulums = 75;
   Pendulum pendulums[numPendulums];
   float startTime;
   ofImage img;

@@ -10,7 +10,7 @@ void pendulumWaves::setup(){
   height = ofGetHeight();
   //configure all of our pendula
   for(int i = 0; i < numPendulums; i++) {
-    float freq = (20.0 + i) / 240.0;
+    float freq = (20.0 + i) / 480.0;
     pendulums[i].index = i;
     pendulums[i].freq = freq;
     pendulums[i].pos = 1;
@@ -19,19 +19,6 @@ void pendulumWaves::setup(){
   }
   startTime = ofGetElapsedTimeMillis();
   startTime *= 0.001;
-
-  //setup audio
-  int bufferSize = 512;
-  sampleRate = 44100;
-  phase = 0;
-  phaseAdder = 0.0;
-  targetFrequency = 2000;
-  phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
-  volume = 1.0;
-
-  lAudio.assign(bufferSize, 0.0);
-  rAudio.assign(bufferSize, 0.0);
-  //  soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
 }
 
 //--------------------------------------------------------------
@@ -60,7 +47,7 @@ void pendulumWaves::draw(){
   ofPushMatrix();
   ofTranslate(width/2, height/2);
   for(int i = 0; i < numPendulums; i++) {
-    float radius = width / (2 * numPendulums) * i;
+    float radius = width/(2*numPendulums)*i;
     float theta = ofMap(pendulums[i].pos, -1, 1, 0, TWO_PI);
     ofCircle(radius*cos(theta), radius*sin(theta), 10);
   }
