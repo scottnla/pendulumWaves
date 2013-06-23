@@ -10,7 +10,7 @@ void pendulumWaves::setup(){
   height = ofGetHeight();
   //configure all of our pendula
   for(int i = 0; i < numPendulums; i++) {
-    float freq = (20.0 + i) / 60.0;
+    float freq = (20.0 + i) / 240.0;
     pendulums[i].index = i;
     pendulums[i].freq = freq;
     pendulums[i].pos = 1;
@@ -19,6 +19,19 @@ void pendulumWaves::setup(){
   }
   startTime = ofGetElapsedTimeMillis();
   startTime *= 0.001;
+
+  //setup audio
+  int bufferSize = 512;
+  sampleRate = 44100;
+  phase = 0;
+  phaseAdder = 0.0;
+  targetFrequency = 2000;
+  phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+  volume = 1.0;
+
+  lAudio.assign(bufferSize, 0.0);
+  rAudio.assign(bufferSize, 0.0);
+  //  soundStream.setup(this, 2, 0, sampleRate, bufferSize, 4);
 }
 
 //--------------------------------------------------------------
@@ -36,20 +49,23 @@ void pendulumWaves::update(){
       pendulums[i].hit = 1;
     }
     else {
-      pendulums[i].hit *= 0.85;
+      pendulums[i].hit *= 0.95;
     }
   }
+  
 }
 
 //--------------------------------------------------------------
 void pendulumWaves::draw(){
   ofPushMatrix();
-  ofTranslate(width/2, height/2);
   for(int i = 0; i < numPendulums; i++) {
-    ofSetColor(255*pendulums[i].hit);
-    float rad = ofMap(pendulums[i].pos, -1, 1, 0, width/2);
     float theta = TWO_PI / numPendulums * i;
-    ofCircle(rad*cos(theta), rad*sin(theta), 20);
+    float delta = TWO_PI / numPendulums;
+    ofPath path;
+    path.moveTo(width/2, height/2);
+    path.arc(width/2, height/2, height/2, height/2, ofRadToDeg(theta - delta/2), ofRadToDeg(theta + delta/2));
+    path.setFillColor(255*pendulums[i].hit);
+    path.draw();
   }
   ofPopMatrix();
 }
@@ -97,4 +113,24 @@ void pendulumWaves::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void pendulumWaves::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+//--------------------------------------------------------------
+void pendulumWaves::audioOut(float* output, int bufferSize, int nChannels){
+  float leftScale = 0.5;
+  float rightScale = 0.5;
+
+  // sin (n) seems to have trouble when n is very large, so we                                                                         
+  // keep phase in the range of 0-TWO_PI like this:                                                                                    
+  while (phase > TWO_PI){
+    phase -= TWO_PI;
+  }
+
+  phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
+  for (int i = 0; i < bufferSize; i++){
+    phase += phaseAdder;
+    float sample = sin(phase);
+    lAudio[i] = output[i*nChannels    ] = sample * volume * leftScale;
+    rAudio[i] = output[i*nChannels + 1] = sample * volume * rightScale;
+  }
 }
